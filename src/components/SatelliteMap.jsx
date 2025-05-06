@@ -3,16 +3,17 @@ import { GoogleMap, Marker, useJsApiLoader } from '@react-google-maps/api';
 
 const containerStyle = {
   width: '100%',
-  height: '400px',
-  borderRadius: '8px'
+  height: '100%',
+  minHeight: '500px'
 };
 
-const SatelliteMap = ({ position }) => {
-  const [map, setMap] = useState(null);
+const SatelliteMap = ({ position, isDemoMode }) => {
   const { isLoaded } = useJsApiLoader({
     id: 'google-map-script',
-    googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY 
+    googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY
   });
+
+  const [map, setMap] = useState(null);
 
   useEffect(() => {
     if (map && position) {
@@ -23,41 +24,47 @@ const SatelliteMap = ({ position }) => {
   if (!isLoaded) return (
     <div className="map-loading">
       <div className="spinner"></div>
-      <p>Načítavam mapu...</p>
+      <p>Loading map...</p>
     </div>
   );
 
   return (
-    <GoogleMap
-      mapContainerStyle={containerStyle}
-      center={position}
-      zoom={15}
-      onLoad={map => setMap(map)}
-      options={{
-        streetViewControl: false,
-        mapTypeControl: true,
-        mapTypeId: 'hybrid',
-        styles: [
-          {
-            featureType: "poi",
-            stylers: [{ visibility: "off" }]
-          }
-        ]
-      }}
-    >
-      <Marker 
-        position={position} 
-        title="Pozícia CanSatu"
-        icon={{
-          path: window.google.maps.SymbolPath.CIRCLE,
-          scale: 8,
-          fillColor: "#ff0000",
-          fillOpacity: 1,
-          strokeColor: "#ffffff",
-          strokeWeight: 2
+    <div className="map-container">
+      <GoogleMap
+        mapContainerStyle={containerStyle}
+        center={position}
+        zoom={15}
+        onLoad={map => setMap(map)}
+        options={{
+          streetViewControl: false,
+          mapTypeControl: true,
+          mapTypeId: 'hybrid',
+          styles: [
+            {
+              featureType: "poi",
+              stylers: [{ visibility: "off" }]
+            },
+            {
+              featureType: "transit",
+              stylers: [{ visibility: "off" }]
+            }
+          ]
         }}
-      />
-    </GoogleMap>
+      >
+        <Marker 
+          position={position}
+          title={`Position: ${position.lat.toFixed(4)}, ${position.lng.toFixed(4)}${isDemoMode ? ' (DEMO)' : ''}`}
+          icon={{
+            path: window.google.maps.SymbolPath.CIRCLE,
+            scale: 8,
+            fillColor: isDemoMode ? "#555" : "#ff0000",
+            fillOpacity: 1,
+            strokeColor: "#ffffff",
+            strokeWeight: 2
+          }}
+        />
+      </GoogleMap>
+    </div>
   );
 };
 

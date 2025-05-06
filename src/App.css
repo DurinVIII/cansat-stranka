@@ -2,19 +2,20 @@
 body {
   margin: 0;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background-color: #f0f2f5;
+  background-color: #f5f7fa;
 }
 
 .app-container {
   max-width: 1800px;
   margin: 0 auto;
   padding: 20px;
+  min-height: 100vh;
 }
 
 /* Dashboard mriežka */
 .dashboard-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
   gap: 20px;
   margin-top: 20px;
 }
@@ -22,45 +23,35 @@ body {
 /* Karty s grafmi */
 .chart-card {
   background: white;
-  border-radius: 10px;
+  border-radius: 12px;
   padding: 20px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-  transition: transform 0.2s, box-shadow 0.2s;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
 }
 
 .chart-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+  transform: translateY(-5px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
 }
 
 /* Špecifické farby pre karty */
-.chart-card.temperature {
-  border-top: 4px solid #ff6384;
-}
-
-.chart-card.pressure {
-  border-top: 4px solid #36a2eb;
-}
-
-.chart-card.tvoc {
-  border-top: 4px solid #ff9f40;
-}
-
-.chart-card.co2 {
-  border-top: 4px solid #4bc0c0;
-}
-
-.chart-card.altitude {
-  border-top: 4px solid #9966ff;
-}
+.chart-card.temperature { border-left: 5px solid #ff6384; }
+.chart-card.pressure { border-left: 5px solid #36a2eb; }
+.chart-card.tvoc { border-left: 5px solid #ff9f40; }
+.chart-card.co2 { border-left: 5px solid #4bc0c0; }
+.chart-card.altitude { border-left: 5px solid #9966ff; }
+.chart-card.aqi { border-left: 5px solid #8884d8; }
+.chart-card.altitude-pressure { border-left: 5px solid #ff7300; }
 
 /* Mapa */
 .map-card {
   grid-column: 1 / -1;
   background: white;
-  border-radius: 10px;
+  border-radius: 12px;
   padding: 20px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
 /* Recharts špecifické štýly */
@@ -69,22 +60,87 @@ body {
 }
 
 .recharts-cartesian-axis-tick-value {
-  font-size: 0.85rem;
+  font-size: 0.8rem;
+  fill: #666;
 }
 
 .recharts-tooltip {
-  border-radius: 6px !important;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1) !important;
+  border-radius: 8px !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+  border: none !important;
+  background: rgba(255, 255, 255, 0.95) !important;
+  backdrop-filter: blur(5px);
 }
 
 .recharts-legend-item-text {
-  font-size: 0.9rem !important;
+  font-size: 0.85rem !important;
+  color: #555 !important;
+}
+
+.recharts-line {
+  stroke-width: 3px;
+}
+
+/* Demo režim */
+.demo-mode {
+  position: relative;
+  background: repeating-linear-gradient(
+    45deg,
+    #f8f9fa,
+    #f8f9fa 10px,
+    #e9ecef 10px,
+    #e9ecef 20px
+  );
+}
+
+.demo-mode::after {
+  content: "DEMO MODE";
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: #6c757d;
+  color: white;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* Status indikátory */
+.status-dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin-right: 8px;
+}
+
+.status-dot.online {
+  background-color: #28a745;
+  animation: pulse 1.5s infinite;
+}
+
+.status-dot.offline {
+  background-color: #6c757d;
+}
+
+.status-dot.demo {
+  background-color: #ffc107;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.2); opacity: 0.7; }
+  100% { transform: scale(1); opacity: 1; }
 }
 
 /* Responzivita */
 @media (max-width: 1200px) {
   .dashboard-grid {
-    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
   }
 }
 
@@ -94,7 +150,7 @@ body {
   }
   
   .app-container {
-    padding: 10px;
+    padding: 15px;
   }
   
   .chart-card {
@@ -103,11 +159,128 @@ body {
 }
 
 @media (max-width: 480px) {
-  .recharts-surface {
-    width: 100% !important;
+  .app-container {
+    padding: 10px;
   }
   
-  .recharts-wrapper {
-    width: 100% !important;
+  .chart-card {
+    padding: 12px;
+  }
+  
+  .recharts-tooltip {
+    font-size: 0.8rem !important;
+  }
+}
+.connection-error {
+  background-color: #ffebee;
+  color: #c62828;
+  padding: 10px 15px;
+  border-radius: 4px;
+  margin-bottom: 20px;
+  text-align: center;
+  border-left: 4px solid #c62828;
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.full-width-map {
+  grid-column: 1 / -1;
+  margin-top: 20px;
+}
+
+/* Štýly pre mapu */
+.map-container {
+  width: 100%;
+  height: 500px; /* Alebo iná výška podľa potreby */
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Responzivita */
+@media (max-width: 768px) {
+  .map-container {
+    height: 400px;
+  }
+}
+
+@media (max-width: 480px) {
+  .map-container {
+    height: 300px;
+  }
+}
+.app-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  padding: 20px;
+  max-width: 1800px;
+  margin: 0 auto;
+}
+
+.charts-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.chart-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 20px;
+}
+
+.chart-wrapper {
+  background: white;
+  border-radius: 10px;
+  padding: 15px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.chart-wrapper.full-width {
+  grid-column: 1 / -1;
+}
+
+.map-container {
+  width: 100%;
+  height: 500px;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  margin-top: auto;
+}
+
+.connection-error {
+  background-color: #ffebee;
+  color: #c62828;
+  padding: 10px 15px;
+  border-radius: 4px;
+  margin-bottom: 20px;
+  text-align: center;
+  border-left: 4px solid #c62828;
+}
+
+@media (max-width: 768px) {
+  .chart-row {
+    grid-template-columns: 1fr;
+  }
+  
+  .map-container {
+    height: 400px;
+  }
+}
+
+@media (max-width: 480px) {
+  .map-container {
+    height: 300px;
+  }
+  
+  .app-container {
+    padding: 10px;
   }
 }
