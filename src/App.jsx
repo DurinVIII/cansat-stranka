@@ -66,7 +66,7 @@ function App() {
       
       const newDataPoint = {
         time: data.time,
-        temperature: 0, // Not in your response
+        temperature: sensorValues.TEMP || 0, // Pridané TEMP z backendu
         pressure: sensorValues.PRESS / 100,
         tvoc: sensorValues.TVOC,
         co2: sensorValues.CO2,
@@ -101,7 +101,7 @@ function App() {
         const sensorValues = JSON.parse(item.message);
         return {
           time: item.time,
-          temperature: 0,
+          temperature: sensorValues.TEMP || 0, // Pridané TEMP z backendu
           pressure: sensorValues.PRESS / 100,
           tvoc: sensorValues.TVOC,
           co2: sensorValues.CO2,
@@ -156,8 +156,8 @@ function App() {
     updateData();
     
     // Setup intervals
-    const onlineCheckInterval = setInterval(checkOnlineStatus, 10000); // Check online status every 10s
-    const dataUpdateInterval = setInterval(updateData, 2000); // Update data every 2s
+    const onlineCheckInterval = setInterval(checkOnlineStatus, 10000);
+    const dataUpdateInterval = setInterval(updateData, 2000);
     
     return () => {
       clearInterval(onlineCheckInterval);
@@ -177,7 +177,10 @@ function App() {
       
       <div className="charts-container">
         <div className="chart-row">
-          <TemperatureChart data={sensorData.map(d => ({ time: d.time, value: d.temperature }))} />
+          <TemperatureChart data={sensorData.map(d => ({ 
+            time: d.time, 
+            value: d.temperature // Teraz už bude zobrazovať reálnu teplotu z backendu
+          }))} isDemoMode={isDemoMode} />
           <PressureChart data={sensorData.map(d => ({ time: d.time, value: d.pressure }))} />
         </div>
         <div className="chart-row">
